@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  nodejs-app-service:
+    build:
+      context: .
+    dockerfile: Containerfile
+    ports:
+      - "3500:3500"
+    tty: true
+    container_name: ${CONTAINER_NAME}
+    volumes:
+      - ./server/data:/app/server/data  # Mount host data directory to container
+      - .:/app  # Mount entire project for development (code changes will reflect)
+      - /app/node_modules  # Exclude node_modules to avoid conflicts
+    networks:
+      - main-app-network
+
+
+
+networks:
+  main-app-network:
+    name: ${NETWORK_NAME}
+    driver: bridge
+
+volumes:
+  church-db:  # Define the volume
+  npm-data:
+
+  npm-letsencrypt:

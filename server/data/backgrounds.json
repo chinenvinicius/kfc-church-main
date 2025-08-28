@@ -1,0 +1,42 @@
+[
+  {
+    "id": "56d1abf3-81cf-4f0b-9e61-9aec9b2e99e9",
+    "filename": "86f7d471-4646-45d2-b699-f12873c603f4.jpg",
+    "originalName": "493323198_3671437493149663_3776011060201299910_n.jpg",
+    "url": "/uploads/backgrounds/86f7d471-4646-45d2-b699-f12873c603f4.jpg",
+    "storageType": "local",
+    "uploadedBy": "rish",
+    "uploadedAt": "2025-06-16T05:59:48.541Z",
+    "isActive": true
+  },
+  {
+    "id": "431b4577-de39-44d2-82b0-ed89ab7ed11b",
+    "filename": "4a166007-7ab4-4bcf-a188-42ac3c3ba757.jpeg",
+    "originalName": "IMG_6699.jpeg",
+    "url": "/api/webdav/image/4a166007-7ab4-4bcf-a188-42ac3c3ba757.jpeg",
+    "storageType": "webdav",
+    "uploadedBy": "rish",
+    "uploadedAt": "2025-06-21T02:04:48.415Z",
+    "isActive": false
+  },
+  {
+    "id": "a5ecd7d6-107a-4e6a-9750-391b1507bd9a",
+    "filename": "8e18bcba-8adb-4115-bd4b-ea436c2a550d.jpg",
+    "originalName": "1000008179.jpg",
+    "url": "/api/webdav/image/8e18bcba-8adb-4115-bd4b-ea436c2a550d.jpg",
+    "storageType": "webdav",
+    "uploadedBy": "vini",
+    "uploadedAt": "2025-06-21T02:13:18.170Z",
+    "isActive": false
+  },
+  {
+    "id": "e6656d36-9c48-4f5b-b031-9edac2b2325c",
+    "filename": "f95962a5-325d-4c48-8dae-e0f2472aff1c.png",
+    "originalName": "whiteboard.png",
+    "url": "/uploads/backgrounds/f95962a5-325d-4c48-8dae-e0f2472aff1c.png",
+    "storageType": "local",
+    "uploadedBy": "vini",
+    "uploadedAt": "2025-07-04T14:01:52.041Z",
+    "isActive": false
+  }
+]
