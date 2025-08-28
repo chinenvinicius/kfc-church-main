@@ -1,0 +1,14 @@
+This is a test file for the KFC Church File Storage System.
+
+You can upload this file to test the functionality.
+
+Features tested:
+- File upload
+- File categorization
+- File storage
+- File listing
+- File download
+- File deletion
+
+Date: 2025-01-27
+System: KFC Church Attendance System

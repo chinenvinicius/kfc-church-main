@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="#667eea"/>
+  
+  <!-- Church Building -->
+  <rect x="180" y="280" width="152" height="160" fill="white" rx="8"/>
+  
+  <!-- Church Door -->
+  <rect x="230" y="360" width="52" height="80" fill="#667eea" rx="26"/>
+  
+  <!-- Church Windows -->
+  <circle cx="210" cy="320" r="12" fill="#667eea"/>
+  <circle cx="302" cy="320" r="12" fill="#667eea"/>
+  
+  <!-- Church Cross -->
+  <rect x="250" y="200" width="12" height="60" fill="white"/>
+  <rect x="235" y="215" width="42" height="12" fill="white"/>
+  
+  <!-- Church Roof -->
+  <path d="M160 280 L256 200 L352 280 Z" fill="white"/>
+  
+  <!-- Attendance Checkmark -->
+  <circle cx="380" cy="150" r="40" fill="#28a745"/>
+  <path d="M365 150 L375 160 L395 140" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- People Icons -->
+  <circle cx="140" cy="380" r="16" fill="#667eea"/>
+  <rect x="128" y="400" width="24" height="32" fill="#667eea" rx="12"/>
+  
+  <circle cx="110" cy="400" r="12" fill="#667eea"/>
+  <rect x="102" y="416" width="16" height="24" fill="#667eea" rx="8"/>
+</svg>

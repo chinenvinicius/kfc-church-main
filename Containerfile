@@ -1,0 +1,47 @@
+FROM node:latest
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Install system dependencies for native modules (better-sqlite3)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy package.json and package-lock.json (if available)
+
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Install app dependencies
+# Copy package files first
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN pnpm install --ignore-scripts
+
+# Bundle app source
+COPY . .
+
+# Create data directory and set permissions
+RUN mkdir -p /app/server/data && chmod 755 /app/server/data
+
+# Expose port 3500
+EXPOSE 3500
+
+# Build the application for production
+RUN pnpm run build
+
+# Set environment variable to disable Nuxt telemetry
+ENV NUXT_TELEMETRY_DISABLED=1
+
+# Set the port for production
+ENV NUXT_PORT=3500
+ENV NUXT_HOST=0.0.0.0
+
+# Define the command to run your app
+# Use development mode for hot reloading when volumes are mounted
+CMD ["pnpm", "run", "dev"]

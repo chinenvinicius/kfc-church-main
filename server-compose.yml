@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  # nginx-proxy-manager: # <--- REMOVE OR COMMENT OUT THIS ENTIRE BLOCK
+  #   image: jc21/nginx-proxy-manager:latest
+  #   ports:
+  #     - "8081:80"
+  #     - "8443:443"
+  #     - "8181:81"
+  #   volumes:
+  #     - npm-data:/data
+  #     - npm-letsencrypt:/etc/letsencrypt
+  #   environment:
+  #     - DB_MYSQL_HOST=localhost
+  #     - DB_MYSQL_PORT=3306
+  #   restart: always
+  #   networks:
+  #     - main-app-network
+
+  nginx: # Keep this service as it's your main reverse proxy
+    image: nginx:latest
+    ports:
+      - "80:80" # This will now bind successfully to host port 80
+      - "443:443" # This will now bind successfully to host port 443
+    container_name: nginx # Using a direct name is fine
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - nodejs-app-service # Ensure nodejs-app-service is up first
+    networks:
+      - main-app-network
+    restart: always # Add restart policy for resilience
+
+  duckdns: # Keep this service to update your DNS
+    container_name: duckdns
+    image: linuxserver/duckdns
+    environment:
+      - SUBDOMAINS=lunatolab # Ensure DUCKDNS_SUBDOMAIN is set in your .env
+      - TOKEN=169057e7-1954-4e4c-9981-c106fd11e090 # Ensure DUCKDNS_TOKEN is set in your .env
+      - TZ=Asia/Tokyo
+    restart: always
+    networks:
+      - main-app-network
+
+networks:
+  main-app-network:
+    name: ${NETWORK_NAME} # This network needs to be created by one of the compose files
+    driver: bridge
+
+volumes:
+  # npm-data: # <--- REMOVE OR COMMENT OUT THESE VOLUMES IF YOU REMOVED NPM
+  # npm-letsencrypt: # <--- REMOVE OR COMMENT OUT THESE VOLUMES IF YOU REMOVED NPM
+  church-db: # Keep this if used by nodejs-app-service
