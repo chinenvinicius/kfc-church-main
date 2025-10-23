@@ -37,6 +37,10 @@ o,mk  <div class="attendance-page">
         <div class="stat-number">{{ attendanceStats.percentage }}%</div>
         <div class="stat-label">Attendance Rate</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ visitors.length }}</div>
+        <div class="stat-label">Visitors</div>
+      </div>
     </div>
 
     <!-- Search and Filters -->
@@ -439,6 +443,32 @@ const visitorForm = ref({
 })
 
 // Bulk actions modal
+// Update polling
+const lastCheck = ref(new Date().toISOString())
+let updatePollingInterval = null
+
+// Check for real-time updates
+const checkForUpdates = async () => {
+  try {
+    const response = await $fetch(`/api/updates/notifications?lastCheck=${lastCheck.value}`)
+    
+    if (response.hasUpdates && response.notifications.length > 0) {
+      response.notifications.forEach(notification => {
+        if (notification.type === 'excel_import') {
+          // Show a subtle notification
+          console.log(`Excel file updated: ${notification.filename}`)
+          // Reload attendance data to show the changes
+          loadAttendanceData()
+        }
+      })
+      
+      lastCheck.value = response.timestamp
+    }
+  } catch (error) {
+    console.error('Failed to check for updates:', error)
+  }
+}
+
 const showBulkActionsModal = ref(false)
 
 // Computed properties
@@ -506,8 +536,8 @@ const loadAttendanceData = async () => {
     loading.value = true
 
     // Load members
-    const membersResponse = await $fetch('/api/members')
-    members.value = membersResponse
+    const membersResponse = await $fetch('/api/members?limit=1000')
+    members.value = membersResponse.data || []
 
     // Load attendance for selected date
     const attendanceResponse = await $fetch(`/api/attendance?sabbathDate=${selectedDate.value}`)
@@ -515,7 +545,7 @@ const loadAttendanceData = async () => {
 
     // Load visitors for selected date
     const visitorsResponse = await $fetch(`/api/visitors?sabbathDate=${selectedDate.value}`)
-    visitors.value = visitorsResponse
+    visitors.value = visitorsResponse || []
 
     // Load notes - ensure all members have note entries
     attendanceNotes.value = {}
@@ -817,8 +847,15 @@ const saveVisitor = async () => {
   } finally {
     savingVisitor.value = false
   }
+  // Start polling for updates every 5 seconds
+  updatePollingInterval = setInterval(checkForUpdates, 5000)
 }
 
+onUnmounted(() => {
+  if (updatePollingInterval) {
+    clearInterval(updatePollingInterval)
+  }
+})
 const deleteVisitor = async (visitorId) => {
   if (!confirm('Are you sure you want to delete this visitor?')) {
     return

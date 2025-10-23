@@ -2,6 +2,7 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import { importAttendanceFromCSV } from '../../utils/csvUtils'
 import { ImportAttendanceOptions } from '../../utils/types'
+import { syncAttendanceToGoogleSheets } from '../../utils/googleSheetsService'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -53,6 +54,14 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Unsupported file type. Only CSV, XLS, and XLSX files are supported.'
+      })
+    }
+    
+    // Sync to Google Sheets if enabled and import was successful (non-blocking)
+    if (result.success && body.syncToGoogleSheets !== false) {
+      // Run sync in background without waiting
+      syncAttendanceToGoogleSheets().catch(error => {
+        console.error('Background Google Sheets sync failed:', error)
       })
     }
     

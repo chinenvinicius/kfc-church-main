@@ -496,5 +496,15 @@
     "category": "child",
     "registrationDate": "2025-05-31",
     "isActive": true
+  },
+  {
+    "firstName": "Chinen ",
+    "lastName": "Vinicius",
+    "category": "adult",
+    "registrationDate": "2025-09-20",
+    "id": 66,
+    "isActive": true,
+    "createdAt": "2025-09-20T02:24:59.037Z",
+    "updatedAt": "2025-09-20T02:24:59.037Z"
   }
 ]

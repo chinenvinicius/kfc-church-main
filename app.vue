@@ -57,6 +57,12 @@
                   WebDAV
                 </NuxtLink>
               </li>
+              <li>
+                <NuxtLink to="/google-sheets" class="nav-link">
+                  <Icon name="material-symbols:table-chart" class="nav-icon" />
+                  Google Sheets
+                </NuxtLink>
+              </li>
             </ul>
           </nav>
           
@@ -119,12 +125,18 @@
             </NuxtLink>
           </li>
           <li>
-            <NuxtLink to="/webdav-settings" class="nav-link" @click="closeMobileNav">
-              <Icon name="material-symbols:cloud-outline" class="nav-icon" />
-              WebDAV
-            </NuxtLink>
-          </li>
-        </ul>
+           <NuxtLink to="/webdav-settings" class="nav-link" @click="closeMobileNav">
+             <Icon name="material-symbols:cloud-outline" class="nav-icon" />
+             WebDAV
+           </NuxtLink>
+         </li>
+         <li>
+           <NuxtLink to="/google-sheets" class="nav-link" @click="closeMobileNav">
+             <Icon name="material-symbols:table-chart" class="nav-icon" />
+             Google Sheets
+           </NuxtLink>
+         </li>
+       </ul>
       </div>
     </nav>
     

@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "watchInterval": 30,
+  "autoImport": true,
+  "watchDirectory": "/home/chinen/main/kfc-church-main/server/excel"
+}

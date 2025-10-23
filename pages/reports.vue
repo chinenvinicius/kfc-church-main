@@ -480,16 +480,16 @@ const loadReportData = async () => {
     loading.value = true
     
     // Load all attendance data
-    const attendanceResponse = await $fetch('/api/attendance')
+    const attendanceResponse = await $fetch('/api/attendance?limit=1000')
     const allAttendance = attendanceResponse.data
     
     // Load members data
-    const membersResponse = await $fetch('/api/members')
-    const allMembers = membersResponse
+    const membersResponse = await $fetch('/api/members?limit=1000')
+    const allMembers = membersResponse.data || []
 
     // Load all visitors data
     const visitorsResponse = await $fetch('/api/visitors')
-    const allVisitors = visitorsResponse
+    const allVisitors = visitorsResponse || []
     
     // Filter by date range if specified
     let filteredAttendance = allAttendance

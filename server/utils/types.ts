@@ -27,6 +27,17 @@ export interface Visitor {
   createdAt: string;
   updatedAt: string;
 }
+export interface Admin {
+  id: number;
+  username: string;
+  password: string;
+  email: string;
+  isActive: boolean;
+  isSuperAdmin?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ImportAttendanceOptions {
   overwrite?: boolean;
   validateMembers?: boolean;

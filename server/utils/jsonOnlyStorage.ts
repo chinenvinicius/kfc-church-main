@@ -3,16 +3,7 @@ import { readJsonFile, writeJsonFile } from './jsonDb'
 // Define interfaces locally to avoid importing database module
 import { Member, Attendance, Visitor } from './types'
 
-export interface Admin {
-  id: number;
-  username: string;
-  password: string;
-  email: string;
-  isActive: boolean;
-  isSuperAdmin?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Admin } from './types';
 
 /**
  * =================================================================

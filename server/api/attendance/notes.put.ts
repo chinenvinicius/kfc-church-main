@@ -1,4 +1,5 @@
 import { jsonOnlyStorage } from '~/server/utils/jsonOnlyStorage'
+import { syncAttendanceToGoogleSheets } from '~/server/utils/googleSheetsService'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
     // Find the existing attendance record
     const attendanceRecords = await jsonOnlyStorage.attendance.getAll(body.sabbathDate)
-    const existingRecord = attendanceRecords.find(r => 
+    const existingRecord = attendanceRecords.find(r =>
       r.memberId === body.memberId && r.sabbathDate === body.sabbathDate
     )
 
@@ -29,6 +30,14 @@ export default defineEventHandler(async (event) => {
     const updatedRecord = await jsonOnlyStorage.attendance.update(existingRecord.id, {
       notes: body.notes
     })
+
+    // Sync to Google Sheets if enabled (non-blocking)
+    if (body.syncToGoogleSheets !== false) {
+      // Run sync in background without waiting
+      syncAttendanceToGoogleSheets(body.sabbathDate).catch(error => {
+        console.error('Background Google Sheets sync failed:', error)
+      })
+    }
 
     return {
       success: true,

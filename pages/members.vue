@@ -315,8 +315,8 @@ const filteredMembers = computed(() => {
 const fetchMembers = async () => {
   try {
     loading.value = true
-    const response = await $fetch('/api/members?includeInactive=true')
-    members.value = response
+    const response = await $fetch('/api/members?includeInactive=true&limit=1000')
+    members.value = response.data || []
   } catch (error) {
     console.error('Error fetching members:', error)
   } finally {

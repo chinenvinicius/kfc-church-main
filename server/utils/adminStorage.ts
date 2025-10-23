@@ -1,16 +1,6 @@
 import { getDatabase } from './database';
 import { logError } from './logger';
-
-export interface Admin {
-  id: number;
-  username: string;
-  password: string;
-  email: string;
-  isActive: boolean;
-  isSuperAdmin?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Admin } from './types';
 
 /**
  * Database admin operations with JSON fallback

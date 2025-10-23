@@ -2,27 +2,46 @@
   <div class="dashboard">
     <!-- Page Header -->
     <div class="page-header">
-      <h1>Dashboardsss</h1>
-      <p>DEV elcome to KFC Church Attendance System</p>
+      <h1>Dashboard</h1>
+      <p>Welcome to KFC Church Attendance System</p>
     </div>
 
     <!-- Quick Stats -->
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-number">{{ totalMembers }}</div>
-        <div class="stat-label">Total Members</div>
+        <Icon name="material-symbols:group" class="stat-icon" />
+        <div class="stat-card-content">
+          <div class="stat-number">{{ totalMembers }}</div>
+          <div class="stat-label">Total Members</div>
+        </div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">{{ activeMembers }}</div>
-        <div class="stat-label">Active Members</div>
+        <Icon name="material-symbols:person-check" class="stat-icon" />
+        <div class="stat-card-content">
+          <div class="stat-number">{{ activeMembers }}</div>
+          <div class="stat-label">Active Members</div>
+        </div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">{{ lastSabbathAttendance.present || 0 }}</div>
-        <div class="stat-label">Last Sabbath Present</div>
+        <Icon name="material-symbols:event-available" class="stat-icon" />
+        <div class="stat-card-content">
+          <div class="stat-number">{{ lastSabbathAttendance.present || 0 }}</div>
+          <div class="stat-label">Last Sabbath Present</div>
+        </div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">{{ lastSabbathAttendance.percentage || 0 }}%</div>
-        <div class="stat-label">Attendance Rate</div>
+        <Icon name="material-symbols:trending-up" class="stat-icon" />
+        <div class="stat-card-content">
+          <div class="stat-number" :class="getAttendanceClass(lastSabbathAttendance.percentage)">
+            {{ lastSabbathAttendance.percentage || 0 }}%
+          </div>
+          <div class="stat-label">Attendance Rate</div>
+          <div v-if="lastSabbathAttendance.percentage" class="stat-trend" :class="getTrendClass(lastSabbathAttendance.percentage)">
+            <Icon name="material-symbols:trending-up" v-if="lastSabbathAttendance.percentage >= 70" />
+            <Icon name="material-symbols:trending-flat" v-else-if="lastSabbathAttendance.percentage >= 50" />
+            <Icon name="material-symbols:trending-down" v-else />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -70,15 +89,25 @@
       <div class="card">
         <h2 class="card-title">Recent Attendance</h2>
         <div v-if="recentAttendance.length > 0" class="recent-list">
-          <div 
-            v-for="record in recentAttendance" 
-            :key="`${record.sabbathDate}-${record.memberId}`"
+          <div
+            v-for="record in recentAttendance"
+            :key="record.sabbathDate"
             class="recent-item"
           >
-            <div class="recent-date">{{ formatDate(record.sabbathDate) }}</div>
+            <div class="recent-header">
+              <div class="recent-date">{{ formatDate(record.sabbathDate) }}</div>
+              <div class="recent-percentage">{{ record.percentage }}%</div>
+            </div>
+            <div class="recent-progress">
+              <div
+                class="progress-bar"
+                :style="{ width: record.percentage + '%' }"
+              ></div>
+            </div>
             <div class="recent-stats">
               <span class="stat-present">{{ record.present }} Present</span>
               <span class="stat-absent">{{ record.absent }} Absent</span>
+              <span class="stat-total">{{ record.total }} Total</span>
             </div>
           </div>
         </div>
@@ -119,34 +148,61 @@ const fetchDashboardData = async () => {
   try {
     loading.value = true
     
-    // Fetch members data
-    const membersResponse = await $fetch('/api/members')
-    totalMembers.value = membersResponse.length
-    activeMembers.value = membersResponse.filter(m => m.isActive !== false).length
+    // Fetch members data - get all members for accurate statistics
+    const membersResponse = await $fetch('/api/members?limit=1000')
+    const membersData = membersResponse.data || []
+    totalMembers.value = membersResponse.pagination?.total || membersData.length
+    activeMembers.value = membersData.filter(m => m.isActive !== false).length
     
-    // Fetch recent attendance stats
-    const attendanceResponse = await $fetch('/api/attendance/stats')
-    if (attendanceResponse.success) {
-      lastSabbathAttendance.value = {
-        present: attendanceResponse.stats.present,
-        percentage: attendanceResponse.percentages.present
+    // Fetch all attendance records to find the most recent Sabbath date
+    const attendanceRecords = await $fetch('/api/attendance?limit=1000')
+    const attendanceData = attendanceRecords.data || []
+    const uniqueDates = [...new Set(attendanceData.map(record => record.sabbathDate))]
+    const mostRecentDate = uniqueDates.sort((a, b) => new Date(b) - new Date(a))[0]
+
+    // Fetch attendance stats for the most recent Sabbath
+    if (mostRecentDate) {
+      try {
+        const attendanceResponse = await $fetch('/api/attendance/stats', {
+          query: { sabbathDate: mostRecentDate }
+        })
+        if (attendanceResponse.success) {
+          lastSabbathAttendance.value = {
+            present: attendanceResponse.stats.present,
+            percentage: attendanceResponse.percentages.present
+          }
+        }
+      } catch (statsError) {
+        console.error('Error fetching attendance stats:', statsError)
       }
     }
     
     // Fetch recent attendance records (grouped by date)
-    const allAttendance = await $fetch('/api/attendance')
+    const allAttendance = await $fetch('/api/attendance?limit=1000')
+    const allAttendanceData = allAttendance.data || []
     const groupedByDate = {}
     
-    allAttendance.data.forEach(record => {
+    allAttendanceData.forEach(record => {
       if (!groupedByDate[record.sabbathDate]) {
         groupedByDate[record.sabbathDate] = {
           sabbathDate: record.sabbathDate,
           present: 0,
           absent: 0,
-          other: 0
+          other: 0,
+          total: 0,
+          percentage: 0
         }
       }
       groupedByDate[record.sabbathDate][record.status]++
+      groupedByDate[record.sabbathDate].total++
+    })
+    
+    // Calculate percentage for each date
+    Object.keys(groupedByDate).forEach(date => {
+      const record = groupedByDate[date]
+      record.percentage = totalMembers.value > 0
+        ? Math.round((record.present / totalMembers.value) * 100)
+        : 0
     })
     
     recentAttendance.value = Object.values(groupedByDate)
@@ -168,6 +224,20 @@ const formatDate = (dateString) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+// Get attendance class based on percentage
+const getAttendanceClass = (percentage) => {
+  if (percentage >= 70) return 'positive'
+  if (percentage >= 50) return 'neutral'
+  return 'negative'
+}
+
+// Get trend class based on percentage
+const getTrendClass = (percentage) => {
+  if (percentage >= 70) return 'positive'
+  if (percentage >= 50) return 'neutral'
+  return 'negative'
 }
 
 // Load data on mount
@@ -195,47 +265,6 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 
-.quick-actions {
-  display: grid;
-  gap: 1rem;
-}
-
-.action-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  text-decoration: none;
-  color: var(--text-color);
-  transition: all 0.2s ease;
-  background: white;
-}
-
-.action-card:hover {
-  border-color: var(--primary-color);
-  background: #f8faff;
-}
-
-.action-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: var(--primary-color);
-  flex-shrink: 0;
-}
-
-.action-content h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.action-content p {
-  font-size: 0.85rem;
-  color: var(--text-muted-color);
-  margin: 0;
-}
 
 .recent-list {
   display: flex;
@@ -285,24 +314,6 @@ onMounted(() => {
   height: 3rem;
   margin-bottom: 1rem;
   opacity: 0.5;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 3rem;
-  color: var(--text-muted-color);
-}
-
-.loading-icon {
-  width: 2rem;
-  height: 2rem;
-  margin-bottom: 1rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
